@@ -71,7 +71,7 @@ class TrafficSignMatcherApp:
             messagebox.showinfo("Success", f"Loaded {len(self.dataset_images)} images.")
 
     def upload_query_image(self):
-        file = filedialog.askopenfilename(title="Select Query Image", filetypes=[("Image files", "*.jpg *.png")])
+        file = filedialog.askopenfilename(title="Select Query Image", filetypes=[("Image files", "*.jpg *.png *.jpeg")])
         if file:
             self.query_image = cv2.imread(file)
             img = self.resize_image_to_canvas(self.query_image)

@@ -95,8 +95,8 @@ def visualize_matches(query_image, query_keypoints, best_image, best_keypoints, 
 
 # Main Execution
 if __name__ == "__main__":
-    dataset_folder = "traffic signs"  
-    query_image_path = "stop-sign-traffic_quarry.png"  
+    dataset_folder = "test2"  
+    query_image_path = "query.jpeg"  
 
     dataset_images, image_names = load_dataset_images(dataset_folder)
     query_image = cv2.imread(query_image_path)
