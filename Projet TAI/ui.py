@@ -3,6 +3,7 @@ from tkinter import ttk, filedialog, messagebox
 import cv2
 from PIL import Image, ImageTk
 from sift import load_dataset_images, find_most_similar_image
+#from sift_homography import load_dataset_images, find_most_similar_image
 from ttkbootstrap import Style
 from ttkbootstrap.constants import *
 

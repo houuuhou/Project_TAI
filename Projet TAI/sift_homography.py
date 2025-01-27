@@ -43,7 +43,19 @@ def match_descriptors(desc1, desc2):
             good_matches.append(m)
     return good_matches
 
-# Step 4: Find the Most Similar Image
+# Step 4: Filter Matches using Homography
+def filter_matches_with_homography(matches, keypoints1, keypoints2):
+    if len(matches) < 4:  # Minimum matches required for homography
+        return []
+    src_pts = np.float32([keypoints1[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+    dst_pts = np.float32([keypoints2[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+    H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+    if mask is None:
+        return []
+    matches_mask = mask.ravel().tolist()
+    return [m for i, m in enumerate(matches) if matches_mask[i]]
+
+# Step 5: Find the Most Similar Image
 def find_most_similar_image(query_image, dataset_images, image_names):
     query_keypoints, query_descriptors = sift(query_image)
     if query_descriptors is None:
@@ -62,18 +74,19 @@ def find_most_similar_image(query_image, dataset_images, image_names):
             continue  # Skip images with no descriptors
 
         matches = match_descriptors(query_descriptors, dataset_descriptors)
-        num_good_matches = len(matches)
+        filtered_matches = filter_matches_with_homography(matches, query_keypoints, dataset_keypoints)
+        num_good_matches = len(filtered_matches)
 
         if num_good_matches > max_matches:
             max_matches = num_good_matches
             best_image = dataset_image
             best_image_name = image_name
             best_keypoints = dataset_keypoints
-            best_matches = matches
+            best_matches = filtered_matches
 
     return best_image, best_image_name, best_keypoints, best_matches, query_keypoints
 
-# Step 5: Visualize the Best Match 
+# Step 6: Visualize the Best Match 
 def visualize_matches(query_image, query_keypoints, best_image, best_keypoints, matches):
     img_matches = cv2.drawMatches(query_image, query_keypoints, best_image, best_keypoints, matches, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
     cv2.imshow("Best Match", img_matches)
